@@ -2,7 +2,7 @@
   <h1> Highway Hustle - Unraveling Metro
 Interstate Traffic Trend
     <br><br>
-    ![Data Science](https://media.giphy.com/media/TFPdmm3rdzeZ0kP3zG/giphy.gif)
+    
 
    <img src="https://media.giphy.com/media/qgQUggAC3Pfv687qPC/giphy.gif" width="200"/>
    <img src="https://media.giphy.com/media/WDJBtnl2cxgReYekEu/giphy.gif", width="200"/>
