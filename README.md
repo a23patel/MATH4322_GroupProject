@@ -8,17 +8,43 @@ Interstate Traffic Trend
 
 </h1>
 </div>
----
+
 
 <h2>Members
-  <ul><br>
-    <li><b>Abraar Patel</b></li> 
+  <ul>
+    <li>
+    
+ Abraar Patel ![wave](https://github.com/a23patel/MATH4322_GroupProject/assets/87881362/5ce44179-2db0-4230-a0fd-14136ddb997a)
+ </li>
+  <li>
+    
+Talha Sohail ![wave](https://github.com/a23patel/MATH4322_GroupProject/assets/87881362/5ce44179-2db0-4230-a0fd-14136ddb997a)
+</li>
+<li>
 
+Ujwal Joshi ![wave](https://github.com/a23patel/MATH4322_GroupProject/assets/87881362/5ce44179-2db0-4230-a0fd-14136ddb997a)
+</li>
+<li>
 
-    <li><b>Talha Sohail</b></li>![hello](https://github.com/a23patel/MATH4322_GroupProject/assets/87881362/4fc65e78-b3c3-4fd6-b2da-e88b2f9a76ad)
+Kevin Zheng ![wave](https://github.com/a23patel/MATH4322_GroupProject/assets/87881362/5ce44179-2db0-4230-a0fd-14136ddb997a)
+</li>
+<li>
 
-    <li><b>Ujwal Joshi &nbsp<img src="https://media.giphy.com/media/m0dmKBkncVETJv2h0S/giphy.gif" width="30px"/></b></li>
-   <li><b>Kevin Zheng &nbsp <img src="https://media.giphy.com/media/m0dmKBkncVETJv2h0S/giphy.gif" width="30px"/></b></li>
-    <li><b>Alton Phan &nbsp <img src="https://media.giphy.com/media/m0dmKBkncVETJv2h0S/giphy.gif" width="30px"/></b></li>
-  </ul>
-  </h2>
+Alton Phan ![wave](https://github.com/a23patel/MATH4322_GroupProject/assets/87881362/5ce44179-2db0-4230-a0fd-14136ddb997a)
+
+</li>
+</ul>
+</h2>
+
+<h2> Description </h2>
+
+The primary objective of this project is to create predictive models that can forecast traffic volume on highways based on various features such as weather conditions, national holidays, time of day and other relevant factors. This project leverages R's robust data analysis and machine learning libraries to build and evaluate the prediction models.<br>
+A comprehensive <b>metro interstate traffic dataset</b> sourced from Kaggle is chosen to analyze and uncover valuable insights into traffic flow, congestion and accurately forecast highway traffic volume.<br>
+The dataset has <b>48,205 observations</b> and <b>9 variables</b>.
+
+<h2>Requirements</h2>
+
+1. Install <a href="https://cran.r-project.org/bin/windows/base/">R for Windows</a> or Install <a href="https://cran.r-project.org/bin/macosx/">R for MacOS</a>
+2. Install <a href="https://posit.co/download/rstudio-desktop/">RStudio</a>
+
+  
