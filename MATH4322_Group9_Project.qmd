@@ -1,0 +1,43 @@
+---
+title: "Highway Hustle - Unraveling Metro Interstate Traffic Trends"
+format: pdf
+highlight-style: github
+code-block-bg: true
+code-block-border-left: "#31BAE9"
+title-block-style: plain
+header-includes: 
+- \newcommand{\bi}{\begin{itemize}}
+- \newcommand{\ei}{\end{itemize}}
+- \newcommand{\iset}{\setlength\itemsep{1em}}
+- \usepackage{amsbsy}
+- \usepackage{hyperref}
+- \newcommand{\blue}[1]{\textcolor{blue}{#1}}
+- \newcommand{\red}[1]{\textcolor{red}{#1}}
+- \newcommand{\highlighted}[1]{\textcolor{blue}{\colorbox{yellow}{#1}}}
+- \newcommand{\highlightanswer}[1]{\textcolor{black}{\colorbox{yellow}{#1}}}
+---
+
+\centering \underline{Group Members:}
+
+\centering
+
+\textbf{Abraar Patel (2069545)}
+
+\textbf{Talha Sohail (2092858)}
+
+\textbf{Ujwal Joshi (2018577)}
+
+\textbf{Kevin Zheng (2022183)}
+
+\textbf{Alton Phan (2020230)}
+
+\vspace{3em}
+
+```{r echo=FALSE, out.width = '50%'}
+knitr::include_graphics("traffic.png")
+```
+\newpage
+
+\raggedright
+
+\textbf{INTRODUCTION} 
