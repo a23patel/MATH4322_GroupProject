@@ -13,8 +13,6 @@ header-includes:
 - \usepackage{hyperref}
 - \newcommand{\blue}[1]{\textcolor{blue}{#1}}
 - \newcommand{\red}[1]{\textcolor{red}{#1}}
-- \newcommand{\highlighted}[1]{\textcolor{blue}{\colorbox{yellow}{#1}}}
-- \newcommand{\highlightanswer}[1]{\textcolor{black}{\colorbox{yellow}{#1}}}
 ---
 
 \centering \underline{Group Members:}
@@ -41,3 +39,139 @@ knitr::include_graphics("traffic.png")
 \raggedright
 
 \textbf{INTRODUCTION} 
+
+In the ever-evolving world of urban landscapes, we find inspiration in the vibrant heartbeat of cities and the endless potential for progress. As population growth and urbanization continue their inexorable march, our motivation to decode the intricate patterns of urban life intensifies. Urban transportation networks face increasing challenges due to population growth and urbanization. Understanding traffic patterns and
+congestion on metro interstate highways is crucial for efficient urban planning and management. Therefore, we chose a comprehensive \textbf{metro interstate traffic} dataset sourced from Kaggle to analyze and uncover valuable insights into traffic flow, congestion and accurately forecast traffic volume. The dataset consists of \textbf{48,205 observations} and following \textbf{9 variables}:
+\begin{itemize}
+\item \textbf{\textit{holiday}}: a categorical variable representing a national or regional holiday.
+\item \textbf{\textit{temp}}: a numeric variable that represents the average temperature in kelvin.
+\item \textbf{\textit{rain\_1h}}: a numeric variable that shows the amount of rain occurring in an hour in mm.
+\item \textbf{\textit{snow\_1h}}: a numeric variable that shows the amount of snow occurring in an hour in mm.
+\item \textbf{\textit{clouds\_all}}: numeric variable representing the percentage of cloud cover.
+\item \textbf{\textit{weather\_main}}: categorical variable containing a short textual description of the current weather.
+\item \textbf{\textit{weather\_description}}: categorical variable providing longer textual description and detail for the current weather.
+\item \textbf{\textit{date\_time}}: datetime variable that shows the hour of the data collected in local CST time.
+\item \textbf{\textit{traffic\_volume}}: numeric variable that shows the hourly I-94 reported westbound traffic volume.
+\end{itemize}
+
+The \textbf{main question} we want to answer is: \textbf{Which variables or factors have the most significant
+impact on traffic volume?}
+
+\vspace{0.5em}
+```{r}
+# Importing the dataset and displaying the summary
+traffic = read.csv("C:/Users/hp/Downloads/Metro_Interstate_Traffic_Volume.csv")
+summary(traffic)
+```
+
+```{r}
+# checking if there are any missing values in the entire dataset 
+# (returns TRUE if there are missing values , otherwise FALSE)
+any(is.na(traffic))
+```
+There are no missing values in the dataset.
+
+After conducting some data visualizations, it became evident that data cleaning needed. Implementing data cleaning is an important step in the data analytics process.
+
+\textbf{\underline{Data Cleaning} (Talha and Abraar)}:
+During data cleaning, we formatted the date\_time column, extracted time-related features, and categorized hours into distinct periods. We encoded the holidays column as TRUE or FALSE due to their sparse nature.The outliers in temp and rain\_1h column were removed. We also simplified weather conditions into 'thunderstorm,' 'mist,' 'fog,' and 'haze,' since they are the most distinct weather conditions and then created dummy variables for weather\_description column. The unnecessary columns were dropped, and rain\_1h column was classified into categories such as 'light,' 'moderate,' 'heavy,' and 'no_rain.' Additionally, snow\_1h column was encoded as 'snow' or 'no_snow'. We then converted the categorical variables into factors to prepare the dataset for modeling purposes.
+
+```{r}
+# Removing the outlier in temp variable and rain_1h variable 
+traffic <- traffic[traffic$temp > -400, ]
+traffic <- traffic[traffic$rain_1h <2500, ]
+# Formatting the date_time column in the desired format (%Y-%m-%d %H:%M)
+traffic$date_time <- strftime(traffic$date_time, format = "%Y-%m-%d %H:%M")
+
+# Extracting additional features from date_time variable 
+#(For weekdays, Monday is 0 and Sunday is 6)
+traffic$date_time = as.POSIXct(traffic$date_time)
+traffic$weekday = as.numeric(format(traffic$date_time, "%w"))
+traffic$date = as.Date(traffic$date_time)
+traffic$hour = as.numeric(format(traffic$date_time, "%H"))
+traffic$month = as.numeric(format(traffic$date_time, "%m"))
+traffic$year = as.numeric(format(traffic$date_time, "%Y"))
+```
+
+
+```{r}
+# Classifying the hours as Early Morning, Morning, Afternoon,
+#Evening, Night, Late Night
+modify_hours <- function(x) {
+  Early_Morning <- c(4, 5, 6, 7)
+  Morning <- c(8, 9, 10, 11)
+  Afternoon <- c(12, 13, 14, 15)
+  Evening <- c(16, 17, 18, 19)
+  Night <- c(20, 21, 22, 23)
+  Late_Night <- c(24, 1, 2, 3)
+  
+  if (x %in% Early_Morning) {
+    return('Early_Morning')
+  } else if (x %in% Morning) {
+    return('Morning')
+  } else if (x %in% Afternoon) {
+    return('Afternoon')
+  } else if (x %in% Evening) {
+    return('Evening')
+  } else if (x %in% Night) {
+    return('Night')
+  } else {
+    return('Late_Night')
+  }
+}
+
+# Applying the modify_hours function to the 'hour' column
+traffic$hour <- sapply(traffic$hour, modify_hours)
+```
+
+
+```{r}
+# Since other holidays are very sparse compared to none holidays.
+# Hence, we will encode holidays as TRUE or FALSE
+traffic$holiday <- ifelse(traffic$holiday == 'None', FALSE, TRUE)
+
+# Defining the list of weather conditions
+# We will also replace rows containing "thunderstorm" with "thunderstorm" 
+# and replace other weather conditions with "other"
+weather_conditions <- c("thunderstorm", "mist", "fog", "haze")
+traffic$weather_description <- ifelse(grepl("thunderstorm", traffic$weather_description),
+                                      "thunderstorm", traffic$weather_description)
+traffic$weather_description <- ifelse(!(traffic$weather_description 
+                                        %in% weather_conditions), "other", 
+                                      traffic$weather_description)
+
+#creating dummy variables for weather_description column 
+traffic <- cbind(traffic, model.matrix(~0 + weather_description, data = traffic))
+```
+
+```{r}
+# Renaming the the encoded columns of weather_description
+colnames(traffic)[colnames(traffic) == "weather_descriptionfog"] <- "fog"
+colnames(traffic)[colnames(traffic) == "weather_descriptionhaze"] <- "haze"
+colnames(traffic)[colnames(traffic) == "weather_descriptionmist"] <- "mist"
+colnames(traffic)[colnames(traffic) == "weather_descriptionthunderstorm"] <- "thunderstorm"
+
+# Dropping the unnecessary or not required columns 
+traffic <- traffic[, !colnames(traffic) %in% 
+                     c("weather_description","weather_descriptionother", "weather_main")]
+```
+
+```{r}
+# Separating "rain_1h" into different categories (light, moderate, heavy)
+traffic$rain_1h <- ifelse(traffic$rain_1h == 0, "no_rain",
+                          ifelse(traffic$rain_1h <= 1, "light",
+                                 ifelse(traffic$rain_1h <= 10, "moderate", "heavy")))
+
+
+# Encoding "snow_1h" column  as "snow" or "no_snow"
+traffic$snow_1h[traffic$snow_1h > 0] <- "snow"
+traffic$snow_1h[traffic$snow_1h == 0] <- "no_snow"
+
+# converting all categorical variables into factors
+# to make it suitable for the regression models
+traffic$holiday <- as.factor(traffic$holiday)
+traffic$hour <- as.factor(traffic$hour)
+traffic$rain_1h <- as.factor(traffic$rain_1h)
+traffic$snow_1h <- as.factor(traffic$snow_1h)
+
+```
