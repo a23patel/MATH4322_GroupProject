@@ -60,7 +60,7 @@ impact on traffic volume?}
 \vspace{0.5em}
 ```{r}
 # Importing the dataset and displaying the summary
-traffic = read.csv("C:/Users/talha/Desktop/School/MATH4322/Group Project/Metro_Interstate_Traffic_Volume.csv")
+traffic = read.csv("C:/Users/hp/Downloads/Metro_Interstate_Traffic_Volume.csv")
 summary(traffic)
 ```
 
@@ -93,7 +93,69 @@ traffic$month = as.numeric(format(traffic$date_time, "%m"))
 traffic$year = as.numeric(format(traffic$date_time, "%Y"))
 ```
 
-The rest of the data cleaning code can be found in the R source code file.
+The full data cleaning code can be found in the R source code file.
+
+```{r echo=FALSE}
+# Classifying the hours as Early Morning, Morning, Afternoon,
+#Evening, Night, Late Night
+modify_hours <- function(x) {
+  Early_Morning <- c(4, 5, 6, 7)
+  Morning <- c(8, 9, 10, 11)
+  Afternoon <- c(12, 13, 14, 15)
+  Evening <- c(16, 17, 18, 19)
+  Night <- c(20, 21, 22, 23)
+  Late_Night <- c(24, 1, 2, 3)
+  
+  if (x %in% Early_Morning) {
+    return('Early_Morning')
+  } else if (x %in% Morning) {
+    return('Morning')
+  } else if (x %in% Afternoon) {
+    return('Afternoon')
+  } else if (x %in% Evening) {
+    return('Evening')
+  } else if (x %in% Night) {
+    return('Night')
+  } else {
+    return('Late_Night')
+  }
+}
+
+# Applying the modify_hours function to the 'hour' column
+traffic$hour <- sapply(traffic$hour, modify_hours)
+```
+
+
+```{r echo=FALSE}
+# Since other holidays are very sparse compared to none holidays.
+# Hence, we will encode holidays as TRUE or FALSE
+traffic$holiday <- ifelse(traffic$holiday == 'None', FALSE, TRUE)
+
+# Defining the list of weather conditions
+# We will also replace rows containing "thunderstorm" with "thunderstorm" 
+# and replace other weather conditions with "other"
+weather_conditions <- c("thunderstorm", "mist", "fog", "haze")
+traffic$weather_description <- ifelse(grepl("thunderstorm", traffic$weather_description),
+                                      "thunderstorm", traffic$weather_description)
+traffic$weather_description <- ifelse(!(traffic$weather_description 
+                                        %in% weather_conditions), "other", 
+                                      traffic$weather_description)
+
+#creating dummy variables for weather_description column 
+traffic <- cbind(traffic, model.matrix(~0 + weather_description, data = traffic))
+```
+
+```{r echo=FALSE}
+# Renaming the the encoded columns of weather_description
+colnames(traffic)[colnames(traffic) == "weather_descriptionfog"] <- "fog"
+colnames(traffic)[colnames(traffic) == "weather_descriptionhaze"] <- "haze"
+colnames(traffic)[colnames(traffic) == "weather_descriptionmist"] <- "mist"
+colnames(traffic)[colnames(traffic) == "weather_descriptionthunderstorm"] <- "thunderstorm"
+
+# Dropping the unnecessary or not required columns 
+traffic <- traffic[, !colnames(traffic) %in% 
+                     c("weather_description","weather_descriptionother", "weather_main")]
+```
 
 ```{r}
 # Separating "rain_1h" into different categories (light, moderate, heavy)
@@ -114,3 +176,8 @@ traffic$rain_1h <- as.factor(traffic$rain_1h)
 traffic$snow_1h <- as.factor(traffic$snow_1h)
 
 ```
+
+\newpage
+\raggedright
+
+\textbf{METHODS}
