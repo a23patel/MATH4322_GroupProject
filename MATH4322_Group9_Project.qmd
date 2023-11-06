@@ -71,23 +71,31 @@ any(is.na(traffic))
 ```
 There are no missing values in the dataset.
 
+```{r}
+# Converting the temperatures from Kelvin to Farenheit
+traffic$temp <- (traffic$temp - 273.15) * 9/5 + 32
+```
+
+
 After conducting some data visualizations, it became evident that data cleaning needed. Implementing data cleaning is an important step in the data analytics process.
 
-\textbf{\underline{Data Cleaning} (Talha and Abraar)}:
-During data cleaning, we formatted the date\_time column, extracted time-related features, and categorized hours into distinct periods. We encoded the holidays column as TRUE or FALSE due to their sparse nature.The outliers in temp and rain\_1h column were removed. We also simplified weather conditions into 'thunderstorm,' 'mist,' 'fog,' and 'haze,' since they are the most distinct weather conditions and then created dummy variables for weather\_description column. The unnecessary columns were dropped, and rain\_1h column was classified into categories such as 'light,' 'moderate,' 'heavy,' and 'no_rain.' Additionally, snow\_1h column was encoded as 'snow' or 'no_snow'. We then converted the categorical variables into factors to prepare the dataset for modeling purposes.
+\textbf{\underline{Data Cleaning} (Abraar and Talha)}:
+During data cleaning, we formatted the date\_time column, extracted time-related features, and categorized hours into distinct periods. We converted the holiday variable to a binary format, where 0 represents no holiday, and 1 represents a holiday. The outliers in temp and rain\_1h column were removed. We also simplified weather conditions into 'thunderstorm,' 'mist,' 'fog,' and 'haze,' since they are the most distinct weather conditions and then created dummy variables for weather\_description column. Additionally, we separated the snow\_1h variable into two categories: "snow" and "no_snow" and then created a new binary variable, snow\_present, which indicates the presence of snow (1) or the absence of snow (0) in the dataset. The unnecessary columns were then dropped. The cleaned dataset has 15 variables: \textbf{\textit{traffic\_volume}}, \textbf{\textit{holiday}}, \textbf{\textit{temp}}, \textbf{\textit{rain\_1h}}, \textbf{\textit{clouds\_all}}, \textbf{\textit{date}}, \textbf{\textit{weekday}}, \textbf{\textit{hour}}, \textbf{\textit{month}}, \textbf{\textit{year}}, \textbf{\textit{fog}}, \textbf{\textit{haze}}, \textbf{\textit{mist}}, \textbf{\textit{thunderstorm}}, \textbf{\textit{snow\_present.}}
 
 ```{r}
 # Removing the outlier in temp variable and rain_1h variable 
 traffic <- traffic[traffic$temp > -400, ]
 traffic <- traffic[traffic$rain_1h <2500, ]
+
+traffic$date_time <- strptime(traffic$date_time, format = "%d-%m-%Y %H:%M")
 # Formatting the date_time column in the desired format (%Y-%m-%d %H:%M)
 traffic$date_time <- strftime(traffic$date_time, format = "%Y-%m-%d %H:%M")
 
 # Extracting additional features from date_time variable 
 #(For weekdays, Monday is 0 and Sunday is 6)
 traffic$date_time = as.POSIXct(traffic$date_time)
-traffic$weekday = as.numeric(format(traffic$date_time, "%w"))
 traffic$date = as.Date(traffic$date_time)
+traffic$weekday = as.numeric(format(traffic$date_time, "%w"))
 traffic$hour = as.numeric(format(traffic$date_time, "%H"))
 traffic$month = as.numeric(format(traffic$date_time, "%m"))
 traffic$year = as.numeric(format(traffic$date_time, "%Y"))
@@ -96,88 +104,74 @@ traffic$year = as.numeric(format(traffic$date_time, "%Y"))
 The full data cleaning code can be found in the R source code file.
 
 ```{r echo=FALSE}
-# Classifying the hours as Early Morning, Morning, Afternoon,
-#Evening, Night, Late Night
-modify_hours <- function(x) {
-  Early_Morning <- c(4, 5, 6, 7)
-  Morning <- c(8, 9, 10, 11)
-  Afternoon <- c(12, 13, 14, 15)
-  Evening <- c(16, 17, 18, 19)
-  Night <- c(20, 21, 22, 23)
-  Late_Night <- c(24, 1, 2, 3)
-  
-  if (x %in% Early_Morning) {
-    return('Early_Morning')
-  } else if (x %in% Morning) {
-    return('Morning')
-  } else if (x %in% Afternoon) {
-    return('Afternoon')
-  } else if (x %in% Evening) {
-    return('Evening')
-  } else if (x %in% Night) {
-    return('Night')
-  } else {
-    return('Late_Night')
-  }
-}
-
-# Applying the modify_hours function to the 'hour' column
-traffic$hour <- sapply(traffic$hour, modify_hours)
-```
-
-
-```{r echo=FALSE}
 # Since other holidays are very sparse compared to none holidays.
-# Hence, we will encode holidays as TRUE or FALSE
-traffic$holiday <- ifelse(traffic$holiday == 'None', FALSE, TRUE)
+# Hence, we will encode holidays as 0 (None) or 1 (holidays exist)
+traffic$holiday <- ifelse(traffic$holiday == 'None', 0, 1)
 
-# Defining the list of weather conditions
-# We will also replace rows containing "thunderstorm" with "thunderstorm" 
+# Defining the list of weather conditions (thunderstorm, mist, fog, haze are the most distinct weather condition)
+# So, we will replace rows containing "thunderstorm" with "thunderstorm" 
 # and replace other weather conditions with "other"
 weather_conditions <- c("thunderstorm", "mist", "fog", "haze")
-traffic$weather_description <- ifelse(grepl("thunderstorm", traffic$weather_description),
-                                      "thunderstorm", traffic$weather_description)
-traffic$weather_description <- ifelse(!(traffic$weather_description 
-                                        %in% weather_conditions), "other", 
-                                      traffic$weather_description)
+traffic$weather_description <- ifelse(grepl("thunderstorm", traffic$weather_description), "thunderstorm", traffic$weather_description)
+traffic$weather_description <- ifelse(!(traffic$weather_description %in% weather_conditions), "other", traffic$weather_description)
 
-#creating dummy variables for weather_description column 
+# creating dummy variables for weather_description column 
 traffic <- cbind(traffic, model.matrix(~0 + weather_description, data = traffic))
-```
 
-```{r echo=FALSE}
 # Renaming the the encoded columns of weather_description
 colnames(traffic)[colnames(traffic) == "weather_descriptionfog"] <- "fog"
 colnames(traffic)[colnames(traffic) == "weather_descriptionhaze"] <- "haze"
 colnames(traffic)[colnames(traffic) == "weather_descriptionmist"] <- "mist"
 colnames(traffic)[colnames(traffic) == "weather_descriptionthunderstorm"] <- "thunderstorm"
-
-# Dropping the unnecessary or not required columns 
-traffic <- traffic[, !colnames(traffic) %in% 
-                     c("weather_description","weather_descriptionother", "weather_main")]
 ```
+
 
 ```{r}
-# Separating "rain_1h" into different categories (light, moderate, heavy)
-traffic$rain_1h <- ifelse(traffic$rain_1h == 0, "no_rain",
-                          ifelse(traffic$rain_1h <= 1, "light",
-                                 ifelse(traffic$rain_1h <= 10, "moderate", "heavy")))
+# Separating snow_1h into categories such as "snow" and "no_snow"
+traffic$snow_1h <- ifelse(traffic$snow_1h > 0, "snow", "no_snow")
 
+# creating new column snow_present (binary variable) which specifies
+# if there is a snow or not
+traffic$snow_present <- ifelse(traffic$snow_1h == "snow", 1, 0)
 
-# Encoding "snow_1h" column  as "snow" or "no_snow"
-traffic$snow_1h[traffic$snow_1h > 0] <- "snow"
-traffic$snow_1h[traffic$snow_1h == 0] <- "no_snow"
-
-# converting all categorical variables into factors
-# to make it suitable for the regression models
-traffic$holiday <- as.factor(traffic$holiday)
-traffic$hour <- as.factor(traffic$hour)
-traffic$rain_1h <- as.factor(traffic$rain_1h)
-traffic$snow_1h <- as.factor(traffic$snow_1h)
+# Dropping the unnecessary or not required columns 
+# (date_time, weather_descriptionother column, weather_description
+# and weather_main column)
+# Dropped the date_time column because we already extracted the 
+# features from the date_time column.
+# Dropped snow_1h since we already one-hot encoded these columns.
+traffic <- traffic[, !colnames(traffic) %in%
+                     c("date_time", "snow_1h", "weather_description",
+                       "weather_descriptionother",
+                       "weather_main")]
 
 ```
+
+
+
 
 \newpage
 \raggedright
 
 \textbf{METHODS}
+
+\textbf{\underline{Linear Regression Model} (Abraar and Talha)}
+
+In this section, we are focusing on utilizing a linear regression model to see which predictors are significant in impacting and predicting the interstate highway traffic volume. Linear Regression model tries to find the direct correlation between the response variable, \textbf{traffic\_volume}, against the other potential predictors. We are using linear regression model because the response variable is a continuous or quantitative variable. The biggest advantage of this model is the ability to clearly understand how the response variable is changing with a one unit increase/decrease in each of the predictors. Linear Regression model is also easy to understand and interpret and is also quick to train and make predictions.The disadvantage of linear regression model is that it does not capture complex and non-linear relationships in the data. Furthermore, linear regression models exhibit sensitivity to outliers, leading to potential distortions in regression coefficients and predictive outcomes.
+
+The linear regression formula would be as follows:
+\begin{align*}
+\text{traffic\_volume} =  &  \beta_0 + \beta_1 * \text{holiday} + \beta_2 * \text{temp} + \beta_3 * \text{rain\_1h} \\
+& + \beta_4 * \text{clouds\_all} + \beta_5 * \text{date} + \beta_6 * \text{weekday} + \beta_7 * \text{hour} \\
+& + \beta_8 * \text{month} + \beta_9 * \text{year} + \beta_{10} * \text{fog} + \beta_{11} * \text{haze} \\
+& + \beta_{12} * \text{mist} + \beta_{13} * \text{thunderstorm} + \beta_{14} * \text{snow\_present} + \epsilon
+\end{align*}
+
+
+```{r}
+# creating the linear regression model 
+traffic.lm = lm(traffic_volume ~ ., data=traffic)
+summary(traffic.lm)
+```
+
+From the above summary of our linear regression model, it is evident that almost all predictors are statistically significant in predicting the traffic volume except snow\_present variable. The p-value for snow\_present variable is greater than 0.05 (0.486). Hence, snow\_present variable is not statistically significant in predicting the traffic volume and we would exclude it from consideration. Rest of the predictors have a p-value less than 0.05 and are considered statistically significant in predicting the traffic volume. Therefore, we would retain these predictors in our model.

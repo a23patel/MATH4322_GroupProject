@@ -59,40 +59,15 @@ traffic$date_time <- strptime(traffic$date_time, format = "%d-%m-%Y %H:%M")
 traffic$date_time <- strftime(traffic$date_time, format = "%Y-%m-%d %H:%M")
 
 # Extracting additional features from date_time variable (For weekdays, Monday is 0 and Sunday is 6)
+# The hours from 4 to 7 refers to Early Morning, hours from 8 to 11 refer to Morning 
+# Hours from 12 to 15 refer to Afternoon, hours from 16 to 19 refer to Evening.
+# Hours from 20 to 23 refer to Night and hours from 24 to 3 refer to Late Night.
 traffic$date_time = as.POSIXct(traffic$date_time)
-traffic$weekday = as.numeric(format(traffic$date_time, "%w"))
 traffic$date = as.Date(traffic$date_time)
+traffic$weekday = as.numeric(format(traffic$date_time, "%w"))
 traffic$hour = as.numeric(format(traffic$date_time, "%H"))
 traffic$month = as.numeric(format(traffic$date_time, "%m"))
 traffic$year = as.numeric(format(traffic$date_time, "%Y"))
-
-# Classifying the hours as Early Morning, Morning, Afternoon, Evening, Night, Late Night
-modify_hours <- function(x) {
-  Early_Morning <- c(4, 5, 6, 7)
-  Morning <- c(8, 9, 10, 11)
-  Afternoon <- c(12, 13, 14, 15)
-  Evening <- c(16, 17, 18, 19)
-  Night <- c(20, 21, 22, 23)
-  Late_Night <- c(24, 1, 2, 3)
-  
-  if (x %in% Early_Morning) {
-    return('Early_Morning')
-  } else if (x %in% Morning) {
-    return('Morning')
-  } else if (x %in% Afternoon) {
-    return('Afternoon')
-  } else if (x %in% Evening) {
-    return('Evening')
-  } else if (x %in% Night) {
-    return('Night')
-  } else {
-    return('Late_Night')
-  }
-}
-
-# Applying the modify_hours function to the 'hour' column
-traffic$hour <- sapply(traffic$hour, modify_hours)
-head(traffic)
 
 # Removing the outlier in temp variable 
 traffic <- traffic[traffic$temp > -400, ]
@@ -100,8 +75,8 @@ traffic <- traffic[traffic$temp > -400, ]
 # Removing the outlier in rain_1h variable
 traffic <- traffic[traffic$rain_1h <2500, ]
 
-# Since other holidays are very sparse compared to none holidays.Hence, we will encode holidays as TRUE or FALSE
-traffic$holiday <- ifelse(traffic$holiday == 'None', FALSE, TRUE)
+# Since other holidays are very sparse compared to none holidays.Hence, we will encode holidays as 0 (None) or 1 (holidays exist)
+traffic$holiday <- ifelse(traffic$holiday == 'None', 0, 1)
 
 # Defining the list of weather conditions (thunderstorm, mist, fog, haze are the most distinct weather condition)
 # So, we will replace rows containing "thunderstorm" with "thunderstorm" and replace other weather conditions with "other"
@@ -121,27 +96,25 @@ colnames(traffic)[colnames(traffic) == "weather_descriptionhaze"] <- "haze"
 colnames(traffic)[colnames(traffic) == "weather_descriptionmist"] <- "mist"
 colnames(traffic)[colnames(traffic) == "weather_descriptionthunderstorm"] <- "thunderstorm"
 
-# Dropping the unnecessary or not required columns (weather_descriptionother column, weather_description and weather_main column)
-traffic <- traffic[, !colnames(traffic) %in% c("weather_description","weather_descriptionother", "weather_main")]
+# Separating snow_1h into categories such as "snow" and "no_snow"
+traffic$snow_1h <- ifelse(traffic$snow_1h > 0, "snow", "no_snow")
+table(traffic$snow_1h) 
 
-# Separating "rain_1h" into different categories (light, moderate, heavy)
-traffic$rain_1h <- ifelse(traffic$rain_1h == 0, "no_rain",
-                          ifelse(traffic$rain_1h <= 1, "light",
-                                 ifelse(traffic$rain_1h <= 10, "moderate", "heavy")))
+# creating new column snow_present (binary variable) which specifies if there is a snow or not
+traffic$snow_present <- ifelse(traffic$snow_1h == "snow", 1, 0)
 
+head(traffic)  # printing the first 6 rows of the cleaned dataset so far
 
-# Encoding "snow_1h" column  as "snow" or "no_snow"
-traffic$snow_1h[traffic$snow_1h > 0] <- "snow"
-traffic$snow_1h[traffic$snow_1h == 0] <- "no_snow"
-table(traffic$snow_1h) # Counting the occurrences of "snow" and "no_snow"
-
-# converting all categorical variables into factors to make it suitable for the regression models
-traffic$holiday <- as.factor(traffic$holiday)
-traffic$hour <- as.factor(traffic$hour)
-traffic$rain_1h <- as.factor(traffic$rain_1h)
-traffic$snow_1h <- as.factor(traffic$snow_1h)
+# Dropping the unnecessary or not required columns (date_time, weather_descriptionother column, weather_description and weather_main column)
+# Dropped the date_time column because we already extracted the features from the date_time column.
+# Dropped the rain_1h and snow_1h since we already one-hot encoded these columns.
+traffic <- traffic[, !colnames(traffic) %in% c("date_time", "snow_1h", "weather_description","weather_descriptionother", "weather_main")]
 
 # Print the first few rows of the cleaned dataset and displaying summary of the cleaned dataset
 head(traffic)
 summary(traffic)
 
+# DATA MODELING
+
+traffic.lm = lm(traffic_volume ~ ., data=traffic)
+summary(traffic.lm)
