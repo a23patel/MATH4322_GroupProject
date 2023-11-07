@@ -2,7 +2,7 @@
 
 # IMPORTING THE DATASET
 
-traffic = read.csv("C:/Users/hp/Downloads/Metro_Interstate_Traffic_Volume.csv")
+traffic = read.csv("C:/Users/alton/OneDrive/Documents/MATH4322_GroupProject/Metro_Interstate_Traffic_Volume.csv")
 summary(traffic)
 
 # Printing the first 6 rows of the dataset
@@ -114,7 +114,25 @@ traffic <- traffic[, !colnames(traffic) %in% c("date_time", "snow_1h", "weather_
 head(traffic)
 summary(traffic)
 
-# DATA MODELING
+# DATA MODELING: Linear Regression
 
 traffic.lm = lm(traffic_volume ~ ., data=traffic)
 summary(traffic.lm)
+
+# DATA MODELING: Random Forest
+
+library(randomForest)
+
+#split into train and test 50/50
+train = sample(1:nrow(traffic), nrow(traffic) / 2)
+traffic.train = traffic[train, ]
+traffic.test = traffic[-train, ]
+
+#random forest model
+traffic.rf = randomForest(traffic_volume ~., data = traffic, subset = train, mtry = (ncol(traffic)-1) / 3, importance = TRUE)
+summary(traffic.rf)
+
+#calculate MSE
+yhat.rf = predict(traffic.rf, newdata = traffic[-train,])
+mean((yhat.rf-traffic.test)^2)
+
