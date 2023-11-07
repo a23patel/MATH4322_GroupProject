@@ -2,7 +2,7 @@
 
 # IMPORTING THE DATASET
 
-traffic = read.csv("C:/Users/alton/OneDrive/Documents/MATH4322_GroupProject/Metro_Interstate_Traffic_Volume.csv")
+traffic = read.csv("C:\\KevinWorkArea\\CollegeAcademics\\Fall2023\\math4322\\GroupProject\\Metro_Interstate_Traffic_Volume.csv")
 summary(traffic)
 
 # Printing the first 6 rows of the dataset
@@ -64,10 +64,10 @@ traffic$date_time <- strftime(traffic$date_time, format = "%Y-%m-%d %H:%M")
 # Hours from 20 to 23 refer to Night and hours from 24 to 3 refer to Late Night.
 traffic$date_time = as.POSIXct(traffic$date_time)
 traffic$date = as.Date(traffic$date_time)
-traffic$weekday = as.numeric(format(traffic$date_time, "%w"))
+traffic$weekday = as.factor(format(traffic$date_time, "%w"))
 traffic$hour = as.numeric(format(traffic$date_time, "%H"))
-traffic$month = as.numeric(format(traffic$date_time, "%m"))
-traffic$year = as.numeric(format(traffic$date_time, "%Y"))
+traffic$month = as.factor(format(traffic$date_time, "%m"))
+traffic$year = as.factor(format(traffic$date_time, "%Y"))
 
 # Removing the outlier in temp variable 
 traffic <- traffic[traffic$temp > -400, ]
@@ -117,22 +117,26 @@ summary(traffic)
 # DATA MODELING: Linear Regression
 
 traffic.lm = lm(traffic_volume ~ ., data=traffic)
+traffic.lm
 summary(traffic.lm)
 
 # DATA MODELING: Random Forest
 
 library(randomForest)
 
-#split into train and test 50/50
-train = sample(1:nrow(traffic), nrow(traffic) / 2)
+#split into train and test 80/20
+train = sample(1:nrow(traffic), floor(nrow(traffic)*.8))
 traffic.train = traffic[train, ]
+traffic.train
 traffic.test = traffic[-train, ]
-
+traffic.test
 #random forest model
 traffic.rf = randomForest(traffic_volume ~., data = traffic, subset = train, mtry = (ncol(traffic)-1) / 3, importance = TRUE)
+traffic.rf
 summary(traffic.rf)
 
-#calculate MSE
-yhat.rf = predict(traffic.rf, newdata = traffic[-train,])
-mean((yhat.rf-traffic.test)^2)
+#calculate Test MSE
+yhat.rf = predict(traffic.rf, newdata = traffic.test)
+yhat.rf
+mean((traffic.test$traffic_volume-yhat.rf)^2)
 
