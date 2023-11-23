@@ -207,3 +207,6 @@ for (i in 1:10) {
 
 cat("MSE Values:", rf_MSE, "\n")
 cat("Average Test MSE:", mean(rf_MSE), "\n")
+
+varImpPlot(traffic.rf)
+importance(traffic.rf)
