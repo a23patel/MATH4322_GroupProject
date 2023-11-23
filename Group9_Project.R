@@ -2,7 +2,7 @@
 
 # IMPORTING THE DATASET
 
-traffic = read.csv("C:\\KevinWorkArea\\CollegeAcademics\\Fall2023\\math4322\\GroupProject\\Metro_Interstate_Traffic_Volume.csv")
+traffic = read.csv("Metro_Interstate_Traffic_Volume.csv")
 summary(traffic)
 
 # Printing the first 6 rows of the dataset
@@ -172,6 +172,7 @@ traffic.train = traffic[train, ]
 traffic.train
 traffic.test = traffic[-train, ]
 traffic.test
+
 #random forest model
 traffic.rf = randomForest(traffic_volume ~., data = traffic, subset = train, mtry = (ncol(traffic)-1) / 3, importance = TRUE)
 traffic.rf
@@ -182,3 +183,27 @@ yhat.rf = predict(traffic.rf, newdata = traffic.test)
 yhat.rf
 mean((traffic.test$traffic_volume-yhat.rf)^2)
 
+# 10 iterations of randomForest
+rf_MSE = rep(0,10)
+
+for (i in 1:10) {
+  set.seed(i) 
+  sample <- sample(1:nrow(traffic), 0.8 * nrow(traffic))
+  train_data <- traffic[sample, ]
+  test_data <- traffic[-sample, ]
+  
+  #scaling numeric variables to have zero mean and unit variance (min-max scaling)
+  numeric_cols <- sapply(train_data, is.numeric)
+  train_data_scaled <- as.data.frame(scale(train_data[, numeric_cols]))
+  test_data_scaled <- as.data.frame(scale(test_data[, numeric_cols]))
+  
+  traffic.rf = randomForest(traffic_volume ~., 
+                            data = train_data_scaled,
+                            mtry = (ncol(traffic)-1) / 3, importance = TRUE)
+  
+  yhat.rf = predict(traffic.rf, newdata = test_data_scaled)
+  rf_MSE[i] = mean((yhat.rf - test_data_scaled$traffic_volume)^2)
+}
+
+cat("MSE Values:", rf_MSE, "\n")
+cat("Average Test MSE:", mean(rf_MSE), "\n")
