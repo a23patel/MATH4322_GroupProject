@@ -110,11 +110,56 @@ head(traffic)  # printing the first 6 rows of the cleaned dataset so far
 # Dropped the rain_1h and snow_1h since we already one-hot encoded these columns.
 traffic <- traffic[, !colnames(traffic) %in% c("date_time", "snow_1h", "weather_description","weather_descriptionother", "weather_main")]
 
+# Checking if there are negative or zero values in traffic_volume column
+if (any(traffic$traffic_volume < 0)) {
+  cat("There are negative values in traffic_volume column.\n")
+} else if (any(traffic$traffic_volume == 0)) {
+  cat("There are zero values in traffic_volume column.\n")
+} else {
+  cat("There are no negative or zero values in traffic_volume column.\n")
+}
+
+# Excluding rows with zero or negative traffic_volume
+traffic <- traffic[traffic$traffic_volume > 0, ]
+
+any(is.nan(traffic$traffic_volume))
+any(is.infinite(traffic$traffic_volume))
+
 # Print the first few rows of the cleaned dataset and displaying summary of the cleaned dataset
 head(traffic)
 summary(traffic)
 
-# DATA MODELING
+# DATA MODELING 
+# LINEAR REGRESSION MODEL
 
 traffic.lm = lm(traffic_volume ~ ., data=traffic)
 summary(traffic.lm)
+
+# plotting the linear regression and seeing if any assumptions are violated
+par(mfrow=c(2,2))
+plot(traffic.lm)
+
+MSE = rep(0,10)
+
+# Loop for 10 iterations
+for (i in 1:10) {
+  set.seed(i) 
+  sample <- sample(1:nrow(traffic), 0.8 * nrow(traffic))
+  train_data <- traffic[sample, ]
+  test_data <- traffic[-sample, ]
+  
+  #scaling numeric variables to have zero mean and unit variance (min-max scaling)
+  numeric_cols <- sapply(train_data, is.numeric)
+  train_data_scaled <- as.data.frame(scale(train_data[, numeric_cols]))
+  test_data_scaled <- as.data.frame(scale(test_data[, numeric_cols]))
+  
+  traffic.lm <- lm(traffic_volume ~ ., data = train_data_scaled)
+  
+  yhat <- predict(traffic.lm, newdata = test_data_scaled)
+  MSE[i] = mean((yhat - test_data_scaled$traffic_volume)^2)
+}
+
+cat("MSE Values:", MSE, "\n")
+cat("Average Test MSE:", mean(MSE), "\n")
+
+
