@@ -2,7 +2,7 @@
 
 # IMPORTING THE DATASET
 
-traffic = read.csv("C:\\KevinWorkArea\\CollegeAcademics\\Fall2023\\math4322\\GroupProject\\Metro_Interstate_Traffic_Volume.csv")
+traffic = read.csv("Metro_Interstate_Traffic_Volume.csv")
 summary(traffic)
 
 # Printing the first 6 rows of the dataset
@@ -110,18 +110,58 @@ head(traffic)  # printing the first 6 rows of the cleaned dataset so far
 # Dropped the rain_1h and snow_1h since we already one-hot encoded these columns.
 traffic <- traffic[, !colnames(traffic) %in% c("date_time", "snow_1h", "weather_description","weather_descriptionother", "weather_main")]
 
+# Checking if there are negative or zero values in traffic_volume column
+if (any(traffic$traffic_volume < 0)) {
+  cat("There are negative values in traffic_volume column.\n")
+} else if (any(traffic$traffic_volume == 0)) {
+  cat("There are zero values in traffic_volume column.\n")
+} else {
+  cat("There are no negative or zero values in traffic_volume column.\n")
+}
+
+# Excluding rows with zero or negative traffic_volume
+traffic <- traffic[traffic$traffic_volume > 0, ]
+
 # Print the first few rows of the cleaned dataset and displaying summary of the cleaned dataset
 head(traffic)
 summary(traffic)
 
-# DATA MODELING: Linear Regression
 
+# DATA MODELING: Linear Regression
 traffic.lm = lm(traffic_volume ~ ., data=traffic)
 traffic.lm
 summary(traffic.lm)
 
-# DATA MODELING: Random Forest
+# plotting the linear regression and seeing if any assumptions are violated
+par(mfrow=c(2,2))
+plot(traffic.lm)
 
+MSE = rep(0,10)
+
+# Loop for 10 iterations
+for (i in 1:10) {
+  set.seed(i) 
+  sample <- sample(1:nrow(traffic), 0.8 * nrow(traffic))
+  train_data <- traffic[sample, ]
+  test_data <- traffic[-sample, ]
+  
+  #scaling numeric variables to have zero mean and unit variance (min-max scaling)
+  numeric_cols <- sapply(train_data, is.numeric)
+  train_data_scaled <- as.data.frame(scale(train_data[, numeric_cols]))
+  test_data_scaled <- as.data.frame(scale(test_data[, numeric_cols]))
+  
+  traffic.lm <- lm(traffic_volume ~ ., data = train_data_scaled)
+  
+  yhat <- predict(traffic.lm, newdata = test_data_scaled)
+  MSE[i] = mean((yhat - test_data_scaled$traffic_volume)^2)
+}
+
+cat("MSE Values:", MSE, "\n")
+cat("Average Test MSE:", mean(MSE), "\n")
+
+
+
+# DATA MODELING: Random Forest
 library(randomForest)
 
 #split into train and test 80/20
@@ -130,6 +170,7 @@ traffic.train = traffic[train, ]
 traffic.train
 traffic.test = traffic[-train, ]
 traffic.test
+
 #random forest model
 traffic.rf = randomForest(traffic_volume ~., data = traffic, subset = train, 
                           mtry = (ncol(traffic)-1)/ 3, 
@@ -138,6 +179,7 @@ traffic.rf = randomForest(traffic_volume ~., data = traffic, subset = train,
 varImpPlot(traffic.rf)
 traffic.rf
 summary(traffic.rf)
+
 #Cross-Validation
 library(caret)
 ctrl = trainControl(method = "cv", number = 10) 
@@ -151,3 +193,39 @@ mse
 yhat_test = predict(traffic.rf, newdata = traffic.test)
 mse = mean((yhat_test - traffic.test$traffic_volume)^2)
 mse
+
+
+#calculate Test MSE
+yhat.rf = predict(traffic.rf, newdata = traffic.test)
+yhat.rf
+mean((traffic.test$traffic_volume-yhat.rf)^2)
+
+# 10 iterations of randomForest
+rf_MSE = rep(0,10)
+
+for (i in 1:10) {
+  set.seed(i) 
+  sample <- sample(1:nrow(traffic), 0.8 * nrow(traffic))
+  train_data <- traffic[sample, ]
+  test_data <- traffic[-sample, ]
+  
+  #scaling numeric variables to have zero mean and unit variance (min-max scaling)
+  numeric_cols <- sapply(train_data, is.numeric)
+  train_data_scaled <- as.data.frame(scale(train_data[, numeric_cols]))
+  test_data_scaled <- as.data.frame(scale(test_data[, numeric_cols]))
+  
+  traffic.rf = randomForest(traffic_volume ~., 
+                            data = train_data_scaled,
+                            mtry = (ncol(traffic)-1) / 3, importance = TRUE)
+  
+  yhat.rf = predict(traffic.rf, newdata = test_data_scaled)
+  rf_MSE[i] = mean((yhat.rf - test_data_scaled$traffic_volume)^2)
+}
+
+cat("MSE Values:", rf_MSE, "\n")
+cat("Average Test MSE:", mean(rf_MSE), "\n")
+
+varImpPlot(traffic.rf)
+importance(traffic.rf)
+
+
