@@ -122,9 +122,6 @@ if (any(traffic$traffic_volume < 0)) {
 # Excluding rows with zero or negative traffic_volume
 traffic <- traffic[traffic$traffic_volume > 0, ]
 
-any(is.nan(traffic$traffic_volume))
-any(is.infinite(traffic$traffic_volume))
-
 # Print the first few rows of the cleaned dataset and displaying summary of the cleaned dataset
 head(traffic)
 summary(traffic)
@@ -161,6 +158,7 @@ for (i in 1:10) {
 
 cat("MSE Values:", MSE, "\n")
 cat("Average Test MSE:", mean(MSE), "\n")
+
 
 
 # DATA MODELING: Random Forest
@@ -210,3 +208,4 @@ cat("Average Test MSE:", mean(rf_MSE), "\n")
 
 varImpPlot(traffic.rf)
 importance(traffic.rf)
+

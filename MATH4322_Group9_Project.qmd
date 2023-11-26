@@ -1,5 +1,5 @@
 ---
-title: "Highway Hustle - Unraveling Metro Interstate Traffic Trends"
+title: \customgreen{Highway Hustle - Unraveling Metro Interstate Traffic Trends}
 format: pdf
 highlight-style: github
 code-block-bg: true
@@ -9,25 +9,31 @@ header-includes:
 - \newcommand{\bi}{\begin{itemize}}
 - \newcommand{\ei}{\end{itemize}}
 - \newcommand{\iset}{\setlength\itemsep{1em}}
+- \definecolor{darkgreen}{RGB}{0,100,0} 
+- \definecolor{darkorange}{RGB}{210,102,0}
 - \usepackage{amsbsy}
 - \usepackage{hyperref}
 - \newcommand{\blue}[1]{\textcolor{blue}{#1}}
 - \newcommand{\red}[1]{\textcolor{red}{#1}}
+- \newcommand{\customgreen}[1]{\textcolor{darkgreen}{#1}}
+- \newcommand{\highlighted}[1]{\textcolor{blue}{\colorbox{yellow}{#1}}}
+- \newcommand{\customorange}[1]{\textcolor{darkorange}{#1}}
+
 ---
 
-\centering \underline{Group Members:}
+\centering \underline{\textbf{Group Members:}}
 
 \centering
 
-\textbf{Abraar Patel (2069545)}
+\textbf{\highlighted{Abraar Patel (2069545)}}
 
-\textbf{Talha Sohail (2092858)}
+\textbf{\highlighted{Talha Sohail (2092858)}}
 
-\textbf{Ujwal Joshi (2018577)}
+\textbf{\highlighted{Ujwal Joshi (2018577)}}
 
-\textbf{Kevin Zheng (2022183)}
+\textbf{\highlighted{Kevin Zheng (2022183)}}
 
-\textbf{Alton Phan (2020230)}
+\textbf{\highlighted{Alton Phan (2020230)}}
 
 \vspace{3em}
 
@@ -39,11 +45,22 @@ knitr::include_graphics("traffic.png")
 
 \raggedright
 
+
 \textbf{INTRODUCTION}
 
 In the ever-evolving world of urban landscapes, we find inspiration in the vibrant heartbeat of cities and the endless potential for progress. As population growth and urbanization continue their inexorable march, our motivation to decode the intricate patterns of urban life intensifies. Urban transportation networks face increasing challenges due to population growth and urbanization. Understanding traffic patterns and congestion on metro interstate highways is crucial for efficient urban planning and management. Therefore, we chose a comprehensive \textbf{metro interstate traffic} dataset sourced from Kaggle to analyze and uncover valuable insights into traffic flow, congestion and accurately forecast traffic volume. The dataset consists of \textbf{48,205 observations} and following \textbf{9 variables}:
 
 ```{=tex}
+=======
+\textbf{\customorange{INTRODUCTION}}
+
+In the ever-evolving world of urban landscapes, we find inspiration in the vibrant heartbeat of cities and the endless potential for progress. As population growth and urbanization continue their inexorable march, our motivation to decode the intricate patterns of urban life intensifies. Urban transportation networks face increasing challenges due to population growth and urbanization. Understanding traffic patterns and
+congestion on metro interstate highways is crucial for efficient urban planning and management. By unraveling the complexities of traffic patterns, we aim to provide valuable insights for city planners, policymakers, and researchers. We plan to embark on a detailed analysis of the current state of metro interstate traffic, examining congestion hotspots, peak hours, and the impact on overall urban mobility.
+
+\textbf{\customorange{ABOUT THE DATA}}
+
+We chose a comprehensive \textbf{\customgreen{metro interstate traffic dataset}} sourced from Kaggle to analyze and uncover valuable insights into traffic flow, congestion and accurately forecast traffic volume. The dataset consists of \textbf{48,205 observations} and following \textbf{9 variables}:
+
 \begin{itemize}
 \item \textbf{\textit{holiday}}: a categorical variable representing a national or regional holiday.
 \item \textbf{\textit{temp}}: a numeric variable that represents the average temperature in kelvin.
@@ -55,9 +72,15 @@ In the ever-evolving world of urban landscapes, we find inspiration in the vibra
 \item \textbf{\textit{date\_time}}: datetime variable that shows the hour of the data collected in local CST time.
 \item \textbf{\textit{traffic\_volume}}: numeric variable that shows the hourly I-94 reported westbound traffic volume.
 \end{itemize}
+
 ```
 The \textbf{main question} we want to answer is: \textbf{Which variables or factors have the most significant
 impact on traffic volume?}
+
+
+The \textbf{\blue{main question}} we want to answer is: \textbf{Which variables or factors have the most significant
+impact on traffic volume and how accurate are the models in predicting traffic volume ?}
+
 
 \vspace{0.5em}
 
@@ -82,7 +105,14 @@ traffic$temp <- (traffic$temp - 273.15) * 9/5 + 32
 
 After conducting some data visualizations, it became evident that data cleaning needed. Implementing data cleaning is an important step in the data analytics process.
 
+
 \textbf{\underline{Data Cleaning} (Abraar and Talha)}: During data cleaning, we formatted the date_time column, extracted time-related features, and categorized hours into distinct periods. We converted the holiday variable to a binary format, where 0 represents no holiday, and 1 represents a holiday. The outliers in temp and rain_1h column were removed. We also simplified weather conditions into 'thunderstorm,' 'mist,' 'fog,' and 'haze,' since they are the most distinct weather conditions and then created dummy variables for weather_description column. Additionally, we separated the snow_1h variable into two categories: "snow" and "no_snow" and then created a new binary variable, snow_present, which indicates the presence of snow (1) or the absence of snow (0) in the dataset. The unnecessary columns were then dropped. The cleaned dataset has 15 variables: \textbf{\textit{traffic\_volume}}, \textbf{\textit{holiday}}, \textbf{\textit{temp}}, \textbf{\textit{rain\_1h}}, \textbf{\textit{clouds\_all}}, \textbf{\textit{date}}, \textbf{\textit{weekday}}, \textbf{\textit{hour}}, \textbf{\textit{month}}, \textbf{\textit{year}}, \textbf{\textit{fog}}, \textbf{\textit{haze}}, \textbf{\textit{mist}}, \textbf{\textit{thunderstorm}}, \textbf{\textit{snow\_present.}}
+
+\textbf{\customorange{DATA CLEANING} (Abraar and Talha)}
+\newline
+\newline
+During data cleaning, we formatted the date\_time column, extracted time-related features, and categorized hours into distinct periods. We converted the holiday variable to a binary format, where 0 represents no holiday, and 1 represents a holiday. The outliers in temp and rain\_1h column were removed. We also simplified weather conditions into 'thunderstorm,' 'mist,' 'fog,' and 'haze,' since they are the most distinct weather conditions and then created dummy variables for weather\_description column. Additionally, we separated the snow\_1h variable into two categories: "snow" and "no_snow" and then created a new binary variable, snow\_present, which indicates the presence of snow (1) or the absence of snow (0) in the dataset. The negative and zero values in the traffic\_volume column were also removed.The unnecessary columns were then dropped. The cleaned dataset has 15 variables: \textbf{\textit{traffic\_volume}}, \textbf{\textit{holiday}}, \textbf{\textit{temp}}, \textbf{\textit{rain\_1h}}, \textbf{\textit{clouds\_all}}, \textbf{\textit{date}}, \textbf{\textit{weekday}}, \textbf{\textit{hour}}, \textbf{\textit{month}}, \textbf{\textit{year}}, \textbf{\textit{fog}}, \textbf{\textit{haze}}, \textbf{\textit{mist}}, \textbf{\textit{thunderstorm}}, \textbf{\textit{snow\_present.}}
+
 
 ```{r}
 # Removing the outlier in temp variable and rain_1h variable 
@@ -146,15 +176,32 @@ traffic <- traffic[, !colnames(traffic) %in%
                        "weather_descriptionother",
                        "weather_main")]
 
+# Checking if there are negative or zero values in traffic_volume column
+if (any(traffic$traffic_volume < 0)) {
+  cat("There are negative values in traffic_volume column.\n")
+} else if (any(traffic$traffic_volume == 0)) {
+  cat("There are zero values in traffic_volume column.\n")
+} else {
+  cat("There are no negative or zero values in traffic_volume column.\n")
+}
+
+# Excluding rows with zero or negative traffic_volume
+traffic <- traffic[traffic$traffic_volume > 0, ]
+
 ```
 
 ```{=tex}
 \newpage
 \raggedright
+
 ```
 \textbf{METHODS}
 
 \textbf{\underline{Linear Regression Model} (Abraar and Talha)}
+=======
+
+\textbf{\customorange{LINEAR REGRESSION MODEL} (Abraar and Talha)}
+
 
 In this section, we are focusing on utilizing a linear regression model to see which predictors are significant in impacting and predicting the interstate highway traffic volume. Linear Regression model tries to find the direct correlation between the response variable, \textbf{traffic\_volume}, against the other potential predictors. We are using linear regression model because the response variable is a continuous or quantitative variable. The biggest advantage of this model is the ability to clearly understand how the response variable is changing with a one unit increase/decrease in each of the predictors. Linear Regression model is also easy to understand and interpret and is also quick to train and make predictions.The disadvantage of linear regression model is that it does not capture complex and non-linear relationships in the data. Furthermore, linear regression models exhibit sensitivity to outliers, leading to potential distortions in regression coefficients and predictive outcomes.
 
@@ -171,4 +218,50 @@ traffic.lm = lm(traffic_volume ~ ., data=traffic)
 summary(traffic.lm)
 ```
 
+
 From the above summary of our linear regression model, it is evident that almost all predictors are statistically significant in predicting the traffic volume except snow_present variable. The p-value for snow_present variable is greater than 0.05 (0.486). Hence, snow_present variable is not statistically significant in predicting the traffic volume and we would exclude it from consideration. Rest of the predictors have a p-value less than 0.05 and are considered statistically significant in predicting the traffic volume. Therefore, we would retain these predictors in our model.
+=======
+From the above summary of our linear regression model, it is evident that almost all predictors are statistically significant in predicting the traffic volume except snow\_present variable. The p-value for snow\_present variable is greater than 0.05 (0.486). Hence, snow\_present variable is not statistically significant in predicting the traffic volume and we would exclude it from consideration. Rest of the predictors have a p-value less than 0.05 and are considered statistically significant in predicting the traffic volume. Therefore, we would retain these predictors in our model.The lack of statistical significance for snow\_present variable appears noteworthy, given the typical influence of snow on traffic volume. However, a closer examination of the dataset summary shows that the variable's maximum value is only 0.51mm of snow, which is a minimal amount. Consequently, it seems reasonable that the snow\_present" variable is not significant, as the overall dataset suggests that the limited quantity of snow had negligible impact on traffic conditions.The linear model obtained a $R^2$ value of \textbf{0.1481} which indicates a relatively weak fit for the model as \textbf{only 14%} of the variability in the dependent variable is explained by the independent variables. Hence, the model was not able to adequately capture the complexities of the relationship between the variables.
+
+```{r}
+par(mfrow=c(2,2))
+plot(traffic.lm)
+```
+From the Residuals vs Fitted,Normal Q-Q,and Scale-Location plots,we see that the assumptions of linearity,
+normality,and homoscedasticity(or constant variance) \textbf{do not} hold for the linear model. From the Residuals vs Leverage plot, we notice there are some observations outside of Cook's distance as well as some observations which have slightly high leverage. We decide to normalize the data by \textbf{scaling the numeric variables} through min-max scaling to have a zero mean and unit variance. Scaling the data might improve the performance of the model and also prevent possible overfitting of the data.
+
+Now, we proceed to train the linear model and evaluate the prediction accuracy. We will perform a randomized 
+\textbf{80:20} (training:testing) split on our dataset, calculate the mean squared error (MSE) and then cross-validate 10 times.  Subsequently, we will determine the average MSE across these 10 iterations.
+
+```{r}
+MSE = rep(0,10)
+
+# Loop for 10 iterations
+for (i in 1:10) {
+  set.seed(i) 
+  sample <- sample(1:nrow(traffic), 0.8 * nrow(traffic))
+  train_data <- traffic[sample, ]
+  test_data <- traffic[-sample, ]
+  
+  #scaling numeric variables to have zero mean and unit variance (min-max scaling)
+  numeric_cols <- sapply(train_data, is.numeric)
+  train_data_scaled <- as.data.frame(scale(train_data[, numeric_cols]))
+  test_data_scaled <- as.data.frame(scale(test_data[, numeric_cols]))
+  
+  traffic.lm <- lm(traffic_volume ~ ., data = train_data_scaled)
+  
+  yhat <- predict(traffic.lm, newdata = test_data_scaled)
+  MSE[i] = mean((yhat - test_data_scaled$traffic_volume)^2)
+}
+
+cat("MSE Values:", MSE, "\n")
+cat("Average Test MSE:", mean(MSE), "\n")
+
+```
+
+The average test Mean Squared Error (MSE) obtained across all 10 training and testing iterations is \textbf{0.8556}. MSE quantifies the average squared difference between the predicted values from our model, and the actual observed values in the test sample. A more precise model tends to have an MSE closer to 0, while a less accurate model will result in a higher MSE. An MSE (Mean Squared Error) value of 0.8556 suggests that the model's predictions, on average, have a squared difference of approximately 0.8556 from the actual observed values in the test sample. Considering the average test MSE achieved by the linear model is 0.8556, we conclude that the quality of our model, \textbf{traffic.lm}, is somewhat accurate in predicting traffic volume with slight discrepancies between predicted values and observed values.
+
+
+\textbf{\customorange{RANDOM FOREST MODEL} (Ujwal, Kevin and Alton)}
+
+
