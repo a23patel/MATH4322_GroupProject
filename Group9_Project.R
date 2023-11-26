@@ -131,12 +131,23 @@ traffic.train
 traffic.test = traffic[-train, ]
 traffic.test
 #random forest model
-traffic.rf = randomForest(traffic_volume ~., data = traffic, subset = train, mtry = (ncol(traffic)-1) / 3, importance = TRUE)
+traffic.rf = randomForest(traffic_volume ~., data = traffic, subset = train, 
+                          mtry = (ncol(traffic)-1)/ 3, 
+                          ntree = 1000,
+                          importance = TRUE)
+varImpPlot(traffic.rf)
 traffic.rf
 summary(traffic.rf)
-
-#calculate Test MSE
-yhat.rf = predict(traffic.rf, newdata = traffic.test)
-yhat.rf
-mean((traffic.test$traffic_volume-yhat.rf)^2)
-
+#Cross-Validation
+library(caret)
+ctrl = trainControl(method = "cv", number = 10) 
+model = train(target ~ ., data = traffic.train, method = "rf", trControl = ctrl)
+model
+#Calculate Train MSE
+yhat_train = predict(traffic.rf, newdata = traffic.train)
+mse = mean((yhat_train - traffic.train$traffic_volume)^2)
+mse
+#Calculate Test MSE
+yhat_test = predict(traffic.rf, newdata = traffic.test)
+mse = mean((yhat_test - traffic.test$traffic_volume)^2)
+mse
