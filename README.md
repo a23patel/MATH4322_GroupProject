@@ -17,11 +17,15 @@ Interstate Traffic Trend
 Talha Sohail ![wave](https://github.com/a23patel/MATH4322_GroupProject/assets/87881362/5ce44179-2db0-4230-a0fd-14136ddb997a)
 </li>
 <li>
+
+  
 Ujwal Joshi ![wave](https://github.com/a23patel/MATH4322_GroupProject/assets/87881362/5ce44179-2db0-4230-a0fd-14136ddb997a)
-<li>
+</li>
+
 Kevin Zheng ![wave](https://github.com/a23patel/MATH4322_GroupProject/assets/87881362/5ce44179-2db0-4230-a0fd-14136ddb997a)
 </li>
 <li> 
+  
 Alton Phan ![wave](https://github.com/a23patel/MATH4322_GroupProject/assets/87881362/5ce44179-2db0-4230-a0fd-14136ddb997a)
 </li>
 </ul>
