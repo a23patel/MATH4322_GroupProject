@@ -214,7 +214,9 @@ traffic.lm = lm(traffic_volume ~ ., data=traffic)
 summary(traffic.lm)
 ```
 
-From the above summary of our multiple linear regression model, it is evident that almost all predictors are statistically significant in predicting the traffic volume except `snow\_present` variable. The p-value for snow\_present variable is greater than 0.05 (0.486). Hence, snow\_present variable is not statistically significant in predicting the traffic volume and we would exclude it from consideration. Rest of the predictors have a p-value less than 0.05 and are considered statistically significant in predicting the traffic volume. Therefore, we would retain these predictors in our model.With an F-statistic p-value of less than 2.2×10−16, we can confidently reject the null hypothesis that $\beta_1 =\beta_2 = \beta_3 = \beta_4 = \beta_5= \beta_6 =\beta_7 = \beta_8 = \beta_9 = \beta_10 = \beta_11 = \beta_12 = \beta_13 = \beta_14$ = 0. In other words,at least one predictor demonstrates a statistically significant relationship with `traffic\_volume`. A multiple $R^2$ value of \textbf{0.1481} informs us that approximately 14.81% of the variance is explained by the model, which means that we have a \textbf{very poor fit}.We also notice that variables `year`, `temp`, `hour`, `month`, `weekday`, `haze` and `clouds_all` have positive relationship with response variable `traffic\_volume` and the rest of the variables have a negative effect on `traffic\_volume`. The lack of statistical significance for `snow\_present` variable appears noteworthy, given the typical influence of snow on traffic volume. However, a closer examination of the dataset summary shows that the variable's maximum value is only 0.51mm of snow, which is a minimal amount. Consequently, it seems reasonable that the snow\_present" variable is not significant, as the overall dataset suggests that the limited quantity of snow had negligible impact on traffic conditions.The multiple linear model obtained a $R^2$ value of \textbf{0.1481} which indicates a relatively weak fit for the model as \textbf{only 14%} of the variability in the dependent variable is explained by the independent variables. Hence, the model was not able to adequately capture the complexities of the relationship between the variables.
+From the above summary of our multiple linear regression model, it is evident that almost all predictors are statistically significant in predicting the traffic volume except `snow\_present` variable. The p-value for snow\_present variable is greater than 0.05 (0.486). Hence, snow\_present variable is not statistically significant in predicting the traffic volume and we would exclude it from consideration. Rest of the predictors have a p-value less than 0.05 and are considered statistically significant in predicting the traffic volume. Therefore, we would retain these predictors in our model.
+
+With an F-statistic p-value of less than 2.2×10−16, we can confidently reject the null hypothesis that $\beta_1 =\beta_2 = \beta_3 = \beta_4 = \beta_5= \beta_6 =\beta_7 = \beta_8 = \beta_9 = \beta_10 = \beta_11 = \beta_12 = \beta_13 = \beta_14$ = 0. In other words,at least one predictor demonstrates a statistically significant relationship with `traffic\_volume`. A multiple $R^2$ value of \textbf{0.1481} informs us that approximately 14.81% of the variance is explained by the model, which means that we have a \textbf{very poor fit}.We also notice that variables `year`, `temp`, `hour`, `month`, `weekday`, `haze` and `clouds_all` have positive relationship with response variable `traffic\_volume` and the rest of the variables have a negative effect on `traffic\_volume`. The lack of statistical significance for `snow\_present` variable appears noteworthy, given the typical influence of snow on traffic volume. However, a closer examination of the dataset summary shows that the variable's maximum value is only 0.51mm of snow, which is a minimal amount. Consequently, it seems reasonable that the snow\_present" variable is not significant, as the overall dataset suggests that the limited quantity of snow had negligible impact on traffic conditions.The multiple linear model obtained a $R^2$ value of \textbf{0.1481} which indicates a relatively weak fit for the model as \textbf{only 14%} of the variability in the dependent variable is explained by the independent variables. Hence, the model was not able to adequately capture the complexities of the relationship between the variables.
 
 ```{r}
 par(mfrow=c(2,2))
@@ -255,7 +257,7 @@ cat("Average Test MSE:", mean(MSE), "\n")
 
 The average test Mean Squared Error (MSE) obtained across all 10 training and testing iterations is \textbf{0.8556}. MSE quantifies the average squared difference between the predicted values from our model, and the actual observed values in the test sample. A more precise model tends to have an MSE closer to 0, while a less accurate model will result in a higher MSE. An MSE (Mean Squared Error) value of 0.8556 suggests that the model's predictions, on average, have a squared difference of approximately 0.8556 from the actual observed values in the test sample. Considering the average test MSE achieved by the multiple linear model is 0.8556, we conclude that the quality of our model, \textbf{traffic.lm}, is somewhat accurate in predicting traffic volume with slight discrepancies between predicted values and observed values.
 
-
+\newpage
 \textbf{\customorange{RANDOM FOREST MODEL} (Ujwal, Kevin and Alton)}
 In this section, we focus on utilizing a random forest model to see if it was a better fit in predicting the interstate highway traffic volume. 
 ```{r}
@@ -263,6 +265,7 @@ In this section, we focus on utilizing a random forest model to see if it was a 
 library(randomForest)
 
 #split into train and test 80/20
+set.seed(123)
 train = sample(1:nrow(traffic), floor(nrow(traffic)*.8))
 traffic.train = traffic[train, ]
 traffic.test = traffic[-train, ]
@@ -279,7 +282,7 @@ In this section, our focus turns to utilizing a random forest model to see which
 #Plot
 varImpPlot(traffic.rf)
 ```
-The most important predictors for the random forest model include \textbf{hour and weekday}.
+The most important predictors for the random forest model include \textbf{hour and weekday} since they have the highest \%IncMSE and highest IncNodePurity.
 
 ```{r}
 #Calculating Test MSE
@@ -319,15 +322,14 @@ cat("Average Test MSE:", mean(rf_MSE), "\n")
 In an effort to enhance the performance of our model and mitigate potential overfitting, we opted to normalize the data by employing min-max scaling on the numeric variables. This process aims to achieve a zero mean and one variance for the variables, contributing to improved model performance. The evaluation metric utilized for assessing the model's predictive accuracy is the Mean Squared Error (MSE). Across 10 iterations of training and testing, the average test MSE is calculated to be \textbf{0.2114547}. We can conclude that the predictive accuracy of our model is improved compared to the original run of the random forest, though there still exists some slight discrepancies between the predicted values and the actual observed values in the context of traffic volume prediction.
 
 ```{r}
-#|echo: true
 varImpPlot(traffic.rf)
 importance(traffic.rf)
 ```
-The most important predictors for the 10 iteration random forest model include \textbf{hour and temp}.
+The most important predictors for the 10 iteration random forest model include \textbf{hour and temp} since they have the highest \%IncMSE and highest IncNodePurity.
 
 In summary, the refined 10-iteration random forest model, with data normalization, demonstrated a significant improvement over the initial random forest. The addition of normalization addressed overfitting issues, contributing to enhanced predictive accuracy. While some slight discrepancies still existed, the refined model struck a better balance between complexity and performance, offering valuable insights into the relationships governing traffic volume. The comparison highlights the iterative nature of model development and the importance of addressing overfitting and normalizing data to refine predictive accuracy in complex scenarios such as highway traffic volume prediction.
 
-\textbf{\customorange{CONCLUSION}
+\textbf{\customorange{CONCLUSION}}
 
 Upon comparing the multiple linear regression model with the random forest model, it is evident that the latter is more suitable for inferring the impact of various factors on interstate highway traffic volume. Through 10 iterations of the random forest model, it was consistently observed that the most influential variables were `hour` and `temp`. Interestingly, the finding that `holiday` did not emerge as an important variable in influencing traffic volume contrasts with common expectations given the known effects of holidays on traffic patterns. In the multiple linear regression model, the analysis revealed that variables such as year, average `temperature` in Celcius, `hour`, `month`, `weekday`, `haze`, and `clouds_all` have a positive effect on `traffic volume`. Conversely, variables like `holiday`, `amount of rain`, `date`, `fog`, `mist`, `thunderstorm`, and `snow_present` exhibit a negative effect on `traffic volume`. This aligns with the expectation that certain weather conditions, time-related factors, and seasonal variations play a role in traffic volume fluctuations.
 For predictive purposes, the random forest model consistently demonstrated lower test error rates compared to the multiple linear regression model. In fact, the test error rates for the cross-validated multiple linear regression model were slightly higher than those observed in the 10-iteration random forest model. This underscores the \textbf{superiority of the random forest model} in terms of predictive accuracy, making it a more effective model for understanding and forecasting interstate highway traffic volume based on the given variables.
