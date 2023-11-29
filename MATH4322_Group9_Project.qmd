@@ -46,12 +46,6 @@ knitr::include_graphics("traffic.png")
 \raggedright
 
 
-\textbf{INTRODUCTION}
-
-In the ever-evolving world of urban landscapes, we find inspiration in the vibrant heartbeat of cities and the endless potential for progress. As population growth and urbanization continue their inexorable march, our motivation to decode the intricate patterns of urban life intensifies. Urban transportation networks face increasing challenges due to population growth and urbanization. Understanding traffic patterns and congestion on metro interstate highways is crucial for efficient urban planning and management. Therefore, we chose a comprehensive \textbf{metro interstate traffic} dataset sourced from Kaggle to analyze and uncover valuable insights into traffic flow, congestion and accurately forecast traffic volume. The dataset consists of \textbf{48,205 observations} and following \textbf{9 variables}:
-
-```{=tex}
-=======
 \textbf{\customorange{INTRODUCTION}}
 
 In the ever-evolving world of urban landscapes, we find inspiration in the vibrant heartbeat of cities and the endless potential for progress. As population growth and urbanization continue their inexorable march, our motivation to decode the intricate patterns of urban life intensifies. Urban transportation networks face increasing challenges due to population growth and urbanization. Understanding traffic patterns and
@@ -73,7 +67,7 @@ We chose a comprehensive \textbf{\customgreen{metro interstate traffic dataset}}
 \item \textbf{\textit{traffic\_volume}}: numeric variable that shows the hourly I-94 reported westbound traffic volume.
 \end{itemize}
 
-```
+
 The \textbf{main question} we want to answer is: \textbf{Which variables or factors have the most significant
 impact on traffic volume?}
 
@@ -190,14 +184,10 @@ traffic <- traffic[traffic$traffic_volume > 0, ]
 
 ```
 
-```{=tex}
-\newpage
+
 \raggedright
 
-```
-\textbf{METHODS}
 \textbf{\customorange{MULTIPLE LINEAR REGRESSION MODEL} (Abraar and Talha)}
-
 
 In this section, we focus on utilizing a multiple linear regression model to see which predictors are significant in impacting and predicting the interstate highway traffic volume. Multiple linear Regression model tries to find the direct correlation between the response variable, \textbf{traffic\_volume}, against the other potential predictors. We are using multiple linear regression model because the response variable is a continuous or quantitative variable. The biggest advantage of this model is the ability to clearly understand how the response variable is changing with a one unit increase/decrease in each of the predictors. Multiple linear Regression model is also easy to understand and interpret and is also quick to train and make predictions.The disadvantage of multiple linear regression model is that it does not capture complex and non-linear relationships in the data. Furthermore, multiple linear regression models exhibit sensitivity to outliers, leading to potential distortions in regression coefficients and predictive outcomes.
 
@@ -214,9 +204,9 @@ traffic.lm = lm(traffic_volume ~ ., data=traffic)
 summary(traffic.lm)
 ```
 
-From the above summary of our multiple linear regression model, it is evident that almost all predictors are statistically significant in predicting the traffic volume except `snow\_present` variable. The p-value for snow\_present variable is greater than 0.05 (0.486). Hence, snow\_present variable is not statistically significant in predicting the traffic volume and we would exclude it from consideration. Rest of the predictors have a p-value less than 0.05 and are considered statistically significant in predicting the traffic volume. Therefore, we would retain these predictors in our model.
+From the above summary of our multiple linear regression model, it is evident that almost all predictors are statistically significant in predicting the traffic volume except `snow present` variable. The p-value for snow\_present variable is greater than 0.05 (0.486). Hence, snow\_present variable is not statistically significant in predicting the traffic volume and we would exclude it from consideration. Rest of the predictors have a p-value less than 0.05 and are considered statistically significant in predicting the traffic volume. Therefore, we would retain these predictors in our model.
 
-With an F-statistic p-value of less than 2.2×10−16, we can confidently reject the null hypothesis that $\beta_1 =\beta_2 = \beta_3 = \beta_4 = \beta_5= \beta_6 =\beta_7 = \beta_8 = \beta_9 = \beta_10 = \beta_11 = \beta_12 = \beta_13 = \beta_14$ = 0. In other words,at least one predictor demonstrates a statistically significant relationship with `traffic\_volume`. A multiple $R^2$ value of \textbf{0.1481} informs us that approximately 14.81% of the variance is explained by the model, which means that we have a \textbf{very poor fit}.We also notice that variables `year`, `temp`, `hour`, `month`, `weekday`, `haze` and `clouds_all` have positive relationship with response variable `traffic\_volume` and the rest of the variables have a negative effect on `traffic\_volume`. The lack of statistical significance for `snow\_present` variable appears noteworthy, given the typical influence of snow on traffic volume. However, a closer examination of the dataset summary shows that the variable's maximum value is only 0.51mm of snow, which is a minimal amount. Consequently, it seems reasonable that the snow\_present" variable is not significant, as the overall dataset suggests that the limited quantity of snow had negligible impact on traffic conditions.The multiple linear model obtained a $R^2$ value of \textbf{0.1481} which indicates a relatively weak fit for the model as \textbf{only 14%} of the variability in the dependent variable is explained by the independent variables. Hence, the model was not able to adequately capture the complexities of the relationship between the variables.
+With an F-statistic p-value of less than 2.2×10−16, we can confidently reject the null hypothesis that $\beta_1 =\beta_2 = \beta_3 = \beta_4 = \beta_5= \beta_6 =\beta_7 = \beta_8 = \beta_9 = \beta_10 = \beta_11 = \beta_12 = \beta_13 = \beta_14$ = 0. In other words, at least one predictor demonstrates a statistically significant relationship with `traffic volume`. A multiple $R^2$ value of \textbf{0.1481} informs us that approximately 14.81% of the variance is explained by the model, which means that we have a \textbf{very poor fit}.We also notice that variables `year`, `temp`, `hour`, `month`, `weekday`, `haze` and `clouds_all` have positive relationship with response variable `traffic volume` and the rest of the variables have a negative effect on `traffic volume`. The lack of statistical significance for `snow\_present` variable appears noteworthy, given the typical influence of snow on traffic volume. However, a closer examination of the dataset summary shows that the variable's maximum value is only 0.51mm of snow, which is a minimal amount. Consequently, it seems reasonable that the snow\_present" variable is not significant, as the overall dataset suggests that the limited quantity of snow had negligible impact on traffic conditions.The multiple linear model obtained a $R^2$ value of \textbf{0.1481} which indicates a relatively weak fit for the model as \textbf{only 14\%} of the variability in the dependent variable is explained by the independent variables. Hence, the model was not able to adequately capture the complexities of the relationship between the variables.
 
 ```{r}
 par(mfrow=c(2,2))
@@ -266,21 +256,21 @@ library(randomForest)
 
 #split into train and test 80/20
 set.seed(123)
-train = sample(1:nrow(traffic), floor(nrow(traffic)*.8))
-traffic.train = traffic[train, ]
-traffic.test = traffic[-train, ]
+train <- sample(1:nrow(traffic), 0.8*nrow(traffic))
+traffic.train <- traffic[train, ]
+traffic.test <- traffic[-train, ]
 #random forest model
-traffic.rf = randomForest(traffic_volume ~., data = traffic, subset = train, 
+traffic.rf <- randomForest(traffic_volume ~., data = traffic, subset = train, 
                           mtry = (ncol(traffic)-1)/ 3, 
-                          ntree = 1000,
                           importance = TRUE)
+traffic.rf
 
 ```
 In this section, our focus turns to utilizing a random forest model to see which predictors are significant in impacting and predicting the interstate highway traffic volume. Unlike multiple linear regression, random forests excel in capturing complex, non-linear relationships within the data. The decision to opt for a random forest model is driven by its robustness in handling intricate patterns and resilience against outliers compared to linear regression. The model considers interactions among predictors, providing a more comprehensive understanding of their collective impact on traffic volume. While sacrificing some interpretability compared to multiple linear regression, random forests remain relatively interpretable and compensate with efficient training and predictive capabilities. This approach aims to strike a balance between model complexity and predictive performance, offering insights into the nuanced relationships shaping highway traffic volume.
 
 ```{r}
 #Plot
-varImpPlot(traffic.rf)
+varImpPlot(traffic.rf, sort=TRUE)
 ```
 The most important predictors for the random forest model include \textbf{hour and weekday} since they have the highest \%IncMSE and highest IncNodePurity.
 
@@ -290,7 +280,7 @@ yhat_test = predict(traffic.rf, newdata = traffic.test)
 mse = mean((yhat_test - traffic.test$traffic_volume)^2)
 cat("MSE Value:", mse, "\n")
 ```
-The evaluation of the random forest model's performance reveals a concerning Mean Squared Error (MSE) value of \textbf{113294.7}. This substantial MSE implies a considerable discrepancy between the predicted values and the actual observed values in the test dataset, indicating a less-than-optimal fit of the model. Moreover, the observed high MSE suggests the presence of overfitting issues. Overfitting occurs when a model captures noise in the training data as if it were a genuine pattern, leading to poor generalization to new, unseen data.
+The evaluation of the random forest model's performance reveals a concerning Mean Squared Error (MSE) value of \textbf{122013.5}. This substantial MSE implies a considerable discrepancy between the predicted values and the actual observed values in the test dataset, indicating a less-than-optimal fit of the model. Moreover, the observed high MSE suggests the presence of overfitting issues. Overfitting occurs when a model captures noise in the training data as if it were a genuine pattern, leading to poor generalization to new, unseen data.
 
 ```{r}
 # 10 iterations of randomForest model
@@ -319,13 +309,19 @@ cat("MSE Values:", rf_MSE, "\n")
 cat("Average Test MSE:", mean(rf_MSE), "\n")
 
 ```
-In an effort to enhance the performance of our model and mitigate potential overfitting, we opted to normalize the data by employing min-max scaling on the numeric variables. This process aims to achieve a zero mean and one variance for the variables, contributing to improved model performance. The evaluation metric utilized for assessing the model's predictive accuracy is the Mean Squared Error (MSE). Across 10 iterations of training and testing, the average test MSE is calculated to be \textbf{0.2114547}. We can conclude that the predictive accuracy of our model is improved compared to the original run of the random forest, though there still exists some slight discrepancies between the predicted values and the actual observed values in the context of traffic volume prediction.
+In an effort to enhance the performance of our model and mitigate potential overfitting, we opted to normalize the data by employing min-max scaling on the numeric variables. This process aims to achieve a zero mean and one variance for the variables, contributing to improved model performance. The evaluation metric utilized for assessing the model's predictive accuracy is the Mean Squared Error (MSE). Across 10 iterations of training and testing, the average test MSE is calculated to be \textbf{0.0410031}. We can conclude that the test error rate of our model has improved drastically compared to the original run of the random forest, though there still exists some very slight discrepancies between the predicted values and the actual observed values in the context of traffic volume prediction.
+
+Now, we will display the plot of the 10 iteration random forest model.
 
 ```{r}
-varImpPlot(traffic.rf)
+# cariable importance plot of the 10 iteration random forest model
+varImpPlot(traffic.rf, sort=TRUE)
+```
+```{r}
 importance(traffic.rf)
 ```
-The most important predictors for the 10 iteration random forest model include \textbf{hour and temp} since they have the highest \%IncMSE and highest IncNodePurity.
+
+The most important predictors for the 10 iteration random forest model include \textbf{hour and temp} since they have the highest \%IncMSE and highest IncNodePurity. Given a regression random forest, we place more emphasis on \%IncMSE than IncNodePurity and hence we will not include `temp` as an important predictor since it has a low \%IncMSE and high IncNodePurity.
 
 In summary, the refined 10-iteration random forest model, with data normalization, demonstrated a significant improvement over the initial random forest. The addition of normalization addressed overfitting issues, contributing to enhanced predictive accuracy. While some slight discrepancies still existed, the refined model struck a better balance between complexity and performance, offering valuable insights into the relationships governing traffic volume. The comparison highlights the iterative nature of model development and the importance of addressing overfitting and normalizing data to refine predictive accuracy in complex scenarios such as highway traffic volume prediction.
 
