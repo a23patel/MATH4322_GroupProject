@@ -2,7 +2,7 @@
 
 # IMPORTING THE DATASET
 
-traffic = read.csv("Metro_Interstate_Traffic_Volume.csv")
+traffic = read.csv("Metro_Interstate_Traffic_Volume.csv")  # the path will change depending on the location of csv file in the computer
 summary(traffic)
 
 # Printing the first 6 rows of the dataset
@@ -165,26 +165,22 @@ cat("Average Test MSE:", mean(MSE), "\n")
 library(randomForest)
 
 #split into train and test 80/20
-train = sample(1:nrow(traffic), floor(nrow(traffic)*.8))
-traffic.train = traffic[train, ]
-traffic.train
-traffic.test = traffic[-train, ]
-traffic.test
+set.seed(123)
+train <- sample(1:nrow(traffic), 0.8*nrow(traffic))
+traffic.train <- traffic[train, ]
+traffic.test <- traffic[-train, ]
 
 #random forest model
-traffic.rf = randomForest(traffic_volume ~., data = traffic, subset = train, 
-                          mtry = (ncol(traffic)-1)/ 3, 
-                          ntree = 1000,
-                          importance = TRUE)
-varImpPlot(traffic.rf)
+traffic.rf <- randomForest(traffic_volume ~., data = traffic, subset = train, 
+                           mtry = (ncol(traffic)-1)/ 3, 
+                           importance = TRUE)
+
 traffic.rf
 summary(traffic.rf)
 
-#Cross-Validation
-library(caret)
-ctrl = trainControl(method = "cv", number = 10) 
-model = train(target ~ ., data = traffic.train, method = "rf", trControl = ctrl)
-model
+varImpPlot(traffic.rf, sort=TRUE)
+
+
 #Calculate Train MSE
 yhat_train = predict(traffic.rf, newdata = traffic.train)
 mse = mean((yhat_train - traffic.train$traffic_volume)^2)
@@ -225,7 +221,7 @@ for (i in 1:10) {
 cat("MSE Values:", rf_MSE, "\n")
 cat("Average Test MSE:", mean(rf_MSE), "\n")
 
-varImpPlot(traffic.rf)
+varImpPlot(traffic.rf, sort=TRUE)
 importance(traffic.rf)
 
 

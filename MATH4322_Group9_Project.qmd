@@ -67,11 +67,6 @@ We chose a comprehensive \textbf{\customgreen{metro interstate traffic dataset}}
 \item \textbf{\textit{traffic\_volume}}: numeric variable that shows the hourly I-94 reported westbound traffic volume.
 \end{itemize}
 
-
-The \textbf{main question} we want to answer is: \textbf{Which variables or factors have the most significant
-impact on traffic volume?}
-
-
 The \textbf{\blue{main question}} we want to answer is: \textbf{Which variables or factors have the most significant
 impact on traffic volume and how accurate are the models in predicting traffic volume ?}
 
@@ -98,9 +93,6 @@ traffic$temp <- (traffic$temp - 273.15) * 9/5 + 32
 ```
 
 After conducting some data visualizations, it became evident that data cleaning needed. Implementing data cleaning is an important step in the data analytics process.
-
-
-\textbf{\underline{Data Cleaning} (Abraar and Talha)}: During data cleaning, we formatted the date_time column, extracted time-related features, and categorized hours into distinct periods. We converted the holiday variable to a binary format, where 0 represents no holiday, and 1 represents a holiday. The outliers in temp and rain_1h column were removed. We also simplified weather conditions into 'thunderstorm,' 'mist,' 'fog,' and 'haze,' since they are the most distinct weather conditions and then created dummy variables for weather_description column. Additionally, we separated the snow_1h variable into two categories: "snow" and "no_snow" and then created a new binary variable, snow_present, which indicates the presence of snow (1) or the absence of snow (0) in the dataset. The unnecessary columns were then dropped. The cleaned dataset has 15 variables: \textbf{\textit{traffic\_volume}}, \textbf{\textit{holiday}}, \textbf{\textit{temp}}, \textbf{\textit{rain\_1h}}, \textbf{\textit{clouds\_all}}, \textbf{\textit{date}}, \textbf{\textit{weekday}}, \textbf{\textit{hour}}, \textbf{\textit{month}}, \textbf{\textit{year}}, \textbf{\textit{fog}}, \textbf{\textit{haze}}, \textbf{\textit{mist}}, \textbf{\textit{thunderstorm}}, \textbf{\textit{snow\_present.}}
 
 \textbf{\customorange{DATA CLEANING} (Abraar and Talha)}
 \newline
@@ -266,6 +258,7 @@ traffic.rf <- randomForest(traffic_volume ~., data = traffic, subset = train,
 traffic.rf
 
 ```
+
 In this section, our focus turns to utilizing a random forest model to see which predictors are significant in impacting and predicting the interstate highway traffic volume. Unlike multiple linear regression, random forests excel in capturing complex, non-linear relationships within the data. The decision to opt for a random forest model is driven by its robustness in handling intricate patterns and resilience against outliers compared to linear regression. The model considers interactions among predictors, providing a more comprehensive understanding of their collective impact on traffic volume. While sacrificing some interpretability compared to multiple linear regression, random forests remain relatively interpretable and compensate with efficient training and predictive capabilities. This approach aims to strike a balance between model complexity and predictive performance, offering insights into the nuanced relationships shaping highway traffic volume.
 
 ```{r}
@@ -314,7 +307,7 @@ In an effort to enhance the performance of our model and mitigate potential over
 Now, we will display the plot of the 10 iteration random forest model.
 
 ```{r}
-# cariable importance plot of the 10 iteration random forest model
+# variable importance plot of the 10 iteration random forest model
 varImpPlot(traffic.rf, sort=TRUE)
 ```
 ```{r}
@@ -330,3 +323,16 @@ In summary, the refined 10-iteration random forest model, with data normalizatio
 Upon comparing the multiple linear regression model with the random forest model, it is evident that the latter is more suitable for inferring the impact of various factors on interstate highway traffic volume. Through 10 iterations of the random forest model, it was consistently observed that the most influential variables were `hour` and `temp`. Interestingly, the finding that `holiday` did not emerge as an important variable in influencing traffic volume contrasts with common expectations given the known effects of holidays on traffic patterns. In the multiple linear regression model, the analysis revealed that variables such as year, average `temperature` in Celcius, `hour`, `month`, `weekday`, `haze`, and `clouds_all` have a positive effect on `traffic volume`. Conversely, variables like `holiday`, `amount of rain`, `date`, `fog`, `mist`, `thunderstorm`, and `snow_present` exhibit a negative effect on `traffic volume`. This aligns with the expectation that certain weather conditions, time-related factors, and seasonal variations play a role in traffic volume fluctuations.
 For predictive purposes, the random forest model consistently demonstrated lower test error rates compared to the multiple linear regression model. In fact, the test error rates for the cross-validated multiple linear regression model were slightly higher than those observed in the 10-iteration random forest model. This underscores the \textbf{superiority of the random forest model} in terms of predictive accuracy, making it a more effective model for understanding and forecasting interstate highway traffic volume based on the given variables.
 
+\newpage
+
+\textbf{\customorange{REFERENCES}}
+
+\begin{itemize}
+
+\item \textbf{Interstate Traffic Dataset}. Available at  \href{https://www.kaggle.com/datasets/anshtanwar/metro-interstate-traffic-volume}{https://www.kaggle.com/datasets/anshtanwar/metro-interstate-traffic-volume}
+
+\item \textbf{Data Cleaning in R} \href{https://www.geeksforgeeks.org/data-cleaning-in-r/}{https://www.geeksforgeeks.org/data-cleaning-in-r/}
+
+\item \textbf{ James, G, Witten, D, Hastie, T, and Tibshirani, R}  \textit{An Introduction to Statistical Learning.} Springer New York. DOI: \href{https://doi.org/10.1007/978-1-4614-7138-7}{https://doi.org/10.1007/978-1-4614-7138-7}
+
+\end{itemize}
